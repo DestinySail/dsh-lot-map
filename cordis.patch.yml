@@ -3,5 +3,5 @@
 # memoryLabels, serverStations, commandStations, hookRecords, hookReasons
 - insert:
     - id: lot-map
-      name: '@local/dsh-lot-map'
+      name: 'dsh-lot-map'
       config: {}

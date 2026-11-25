@@ -1,14 +1,14 @@
-// Browser UI entry for @local/dsh-lot-map.
+// Browser UI entry for dsh-lot-map.
 // 1:1 faithful port of alexeyw/lot-map's radial work map + activity feed for DeepSeek Harness.
 window.__ModuleLoader__.load({
-  id: '@local/dsh-lot-map',
+  id: 'dsh-lot-map',
   factory(require) {
     'use strict'
     const React = require('react')
     const h = React.createElement
     const { useState, useEffect, useMemo, useRef, useCallback } = React
 
-    const TAB_ID = '@local/dsh-lot-map'
+    const TAB_ID = 'dsh-lot-map'
     const TAB_KIND = 'lot-map'
     const STORAGE_KEY = 'dsh.lot-map.settings.v1'
     const OPENED_KEY = 'dsh.lot-map.opened.v1'

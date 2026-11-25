@@ -12,7 +12,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 // 1. Manifest, locale, icon, and detail asset checks
 {
   const pkg = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'))
-  assert.equal(pkg.name, '@local/dsh-lot-map')
+  assert.equal(pkg.name, 'dsh-lot-map')
   assert.equal(pkg.dsh.bundle.patch, './cordis.patch.yml')
   assert.equal(pkg.dsh.client.platform, 'web')
   assert.equal(pkg.exports['./icon'], './icon.svg')
@@ -302,7 +302,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
     Error,
   }
   vm.runInNewContext(clientCode, sandbox, { filename: 'client.js' })
-  assert.equal(registered.id, '@local/dsh-lot-map')
+  assert.equal(registered.id, 'dsh-lot-map')
   const plugin = registered.factory((name) => {
     assert.equal(name, 'react', 'client.js must only require react, never host UI packages')
     return mockReact

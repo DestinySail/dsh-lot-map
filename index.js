@@ -1,4 +1,4 @@
-// Host entry for @local/dsh-lot-map.
+// Host entry for dsh-lot-map.
 // Registers the pure `lotMap` session projection and optional `/lot-map` slash command.
 import { createLotMapProjection } from './lib/projection.js'
 

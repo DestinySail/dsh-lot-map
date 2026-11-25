@@ -1,14 +1,33 @@
 {
-  "name": "@local/dsh-lot-map",
+  "name": "dsh-lot-map",
   "version": "1.0.0",
-  "private": true,
-  "description": "Lot Map for DeepSeek Harness: a live visual map beside the chat showing tool calls, model steps, memory, hooks, skills, and subagents in real time.",
+  "description": "Live visual work map beside the chat for DeepSeek Harness: tool calls, model steps, memory, files, shell, network, browser, agents, skills and hooks light up in real time.",
+  "keywords": [
+    "deepseek",
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "lot-map",
+    "visualization",
+    "plugin"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DestinySail/dsh-lot-map.git"
+  },
+  "homepage": "https://github.com/DestinySail/dsh-lot-map",
+  "bugs": {
+    "url": "https://github.com/DestinySail/dsh-lot-map/issues"
+  },
+  "author": "DestinySail",
+  "license": "MIT",
   "type": "module",
   "exports": {
     ".": "./index.js",
     "./client": "./client.js",
     "./locale/*.json": "./locale/*.json",
-    "./icon": "./icon.svg"
+    "./icon": "./icon.svg",
+    "./package.json": "./package.json"
   },
   "files": [
     "index.js",
@@ -18,7 +37,9 @@
     "locale/*.json",
     "docs",
     "icon.svg",
-    "README.md"
+    "README.md",
+    "README.zh.md",
+    "LICENSE"
   ],
   "dsh": {
     "bundle": {

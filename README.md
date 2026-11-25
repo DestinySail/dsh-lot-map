@@ -1,8 +1,19 @@
 # Lot Map for DeepSeek Harness
 
+English | [中文](README.zh.md)
+
 A 1:1 port of [alexeyw/lot-map](https://github.com/alexeyw/lot-map) (MIT) to DeepSeek Harness: a live map of the work beside the chat. Every tool call, model step, hook, skill and subagent sends a pulse from the centre to its station, so you see memory, files, shell, network, browser and agents at work instead of reading a list of commands.
 
 It runs on your machine and sends nothing anywhere.
+
+## Install
+
+- In DSH: **Plugins → Marketplace**, search `dsh-lot-map`, install.
+- From the command line, then restart DSH:
+
+  ```sh
+  dsh plugin --profile <profile> add github:DestinySail/dsh-lot-map
+  ```
 
 ## Open it
 
@@ -69,7 +80,7 @@ Tool classification and hook options run in the host projection and can be confi
 ```yaml
 - insert:
     - id: lot-map
-      name: '@local/dsh-lot-map'
+      name: 'dsh-lot-map'
       config:
         memoryServers: memory,my-memory
         hookRecords: true
