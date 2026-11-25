@@ -1,0 +1,7 @@
+# Optional host classification & hook options under `config`:
+# memoryServers, memoryCommands, memorySubcommands, memoryPaths,
+# memoryLabels, serverStations, commandStations, hookRecords, hookReasons
+- insert:
+    - id: lot-map
+      name: '@local/dsh-lot-map'
+      config: {}

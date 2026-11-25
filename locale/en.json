@@ -1,0 +1,7 @@
+{
+  "meta": {
+    "title": "Lot map",
+    "description": "Live visual work map beside the chat, faithfully replicating lot-map for DeepSeek Harness. Lights up You, Model, Memory, Files, Shell, Network, Browser, Agents, Skills, and Hooks in real time with animated pulses, worn spokes, route trails, clock hands, context ring, token costs, and an expandable activity feed. Open it from the conversation header button, the right sidebar guide, Alt+Shift+M, or /lot-map. Runs 100% locally with no network requests; turning the plugin off removes the sidebar tab, header button, and /lot-map command without altering session history.",
+    "detail": "docs/DETAIL.md"
+  }
+}

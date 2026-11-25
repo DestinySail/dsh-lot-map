@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="300" viewBox="0 0 640 300" fill="none">
+  <rect x="20" y="16" width="600" height="268" rx="16" fill="#0A0C11" stroke="#272C36" stroke-width="1.5"/>
+  <!-- Left radial map -->
+  <ellipse cx="190" cy="150" rx="52" ry="48" stroke="#272C36" stroke-width="0.9" stroke-dasharray="2 5" opacity="0.55"/>
+  <ellipse cx="190" cy="150" rx="84" ry="77" stroke="#272C36" stroke-width="0.9" stroke-dasharray="2 5" opacity="0.55"/>
+  <ellipse cx="190" cy="150" rx="112" ry="102" stroke="#272C36" stroke-width="0.9" stroke-dasharray="2 5" opacity="0.55"/>
+  <!-- Spokes -->
+  <line x1="190" y1="115" x2="190" y2="56" stroke="#E1AC6E" stroke-width="1.4" opacity="0.45"/>
+  <line x1="210" y1="122" x2="256" y2="76" stroke="#E1AC6E" stroke-width="2.2" opacity="0.65"/>
+  <line x1="223" y1="139" x2="288" y2="118" stroke="#62C7BA" stroke-width="1.8" opacity="0.65"/>
+  <line x1="223" y1="161" x2="288" y2="182" stroke="#E1AC6E" stroke-width="2.6" opacity="0.85"/>
+  <line x1="210" y1="178" x2="256" y2="224" stroke="#272C36" stroke-width="1.2"/>
+  <line x1="190" y1="185" x2="190" y2="244" stroke="#E1AC6E" stroke-width="1.6" opacity="0.5"/>
+  <line x1="170" y1="178" x2="124" y2="224" stroke="#272C36" stroke-width="1.2"/>
+  <line x1="157" y1="161" x2="92" y2="182" stroke="#272C36" stroke-width="1.2"/>
+  <line x1="157" y1="139" x2="92" y2="118" stroke="#272C36" stroke-width="1.2"/>
+  <line x1="170" y1="122" x2="124" y2="76" stroke="#272C36" stroke-width="1.2"/>
+  <!-- Route curve -->
+  <path d="M190 66 Q160 100 132 82 M254 84 Q242 124 278 122 M280 132 Q252 152 278 176" stroke="#EBE6DD" stroke-width="1.3" stroke-linecap="round" opacity="0.55"/>
+  <!-- Active pulses -->
+  <circle cx="256" cy="172" r="4" fill="#F0C595"/>
+  <circle cx="247" cy="169" r="2.8" fill="#F0C595" opacity="0.65"/>
+  <circle cx="239" cy="166" r="1.8" fill="#F0C595" opacity="0.35"/>
+  <circle cx="260" cy="127" r="3.4" stroke="#A5E6DC" stroke-width="1.4"/>
+  <!-- Station glows -->
+  <circle cx="262" cy="70" r="24" fill="#E1AC6E" opacity="0.16"/>
+  <circle cx="294" cy="116" r="22" fill="#62C7BA" opacity="0.15"/>
+  <circle cx="294" cy="184" r="26" fill="#E1AC6E" opacity="0.2"/>
+  <circle cx="294" cy="184" r="21" stroke="#F0C595" stroke-width="1.8" stroke-dasharray="48 90" stroke-linecap="round"/>
+  <!-- Station nodes -->
+  <circle cx="190" cy="48" r="15" fill="#12151C" stroke="#272C36" stroke-width="1.2"/>
+  <circle cx="262" cy="70" r="15" fill="#12151C" stroke="#E1AC6E" stroke-width="1.3"/>
+  <circle cx="294" cy="116" r="15" fill="#12151C" stroke="#62C7BA" stroke-width="1.3"/>
+  <circle cx="294" cy="184" r="15" fill="#12151C" stroke="#E1AC6E" stroke-width="1.4"/>
+  <circle cx="262" cy="230" r="15" fill="#12151C" stroke="#272C36" stroke-width="1.2"/>
+  <circle cx="190" cy="252" r="15" fill="#12151C" stroke="#272C36" stroke-width="1.2"/>
+  <circle cx="118" cy="230" r="15" fill="#12151C" stroke="#272C36" stroke-width="1.2"/>
+  <circle cx="86" cy="184" r="15" fill="#12151C" stroke="#272C36" stroke-width="1.2"/>
+  <circle cx="86" cy="116" r="15" fill="#12151C" stroke="#272C36" stroke-width="1.2"/>
+  <circle cx="118" cy="70" r="15" fill="#12151C" stroke="#272C36" stroke-width="1.2"/>
+  <!-- Station glyphs -->
+  <circle cx="190" cy="45" r="2.6" stroke="#9BA1AB" stroke-width="1.2"/>
+  <path d="M185 53c0-3 2.2-4.5 5-4.5s5 1.5 5 4.5" stroke="#9BA1AB" stroke-width="1.2" stroke-linecap="round"/>
+  <rect x="257.5" y="65.5" width="9" height="9" stroke="#F0C595" stroke-width="1.2"/>
+  <path d="M290 119l4-7 4.5 6.5-8.5 0.5z" stroke="#A5E6DC" stroke-width="1.2" stroke-linejoin="round"/>
+  <path d="M290 177.5h6l2.5 2.5v10h-8.5z" stroke="#F0C595" stroke-width="1.2" stroke-linejoin="round"/>
+  <path d="M256.5 226.5l4 3.5-4 3.5M262.5 234h5" stroke="#9BA1AB" stroke-width="1.2" stroke-linecap="round"/>
+  <circle cx="190" cy="252" r="6" stroke="#9BA1AB" stroke-width="1.1"/>
+  <path d="M184 252h12" stroke="#9BA1AB" stroke-width="1.1"/>
+  <rect x="112" y="225.5" width="12" height="9" stroke="#9BA1AB" stroke-width="1.1"/>
+  <circle cx="86" cy="179" r="2" stroke="#9BA1AB" stroke-width="1.1"/>
+  <circle cx="81.5" cy="188" r="2" stroke="#9BA1AB" stroke-width="1.1"/>
+  <circle cx="90.5" cy="188" r="2" stroke="#9BA1AB" stroke-width="1.1"/>
+  <path d="M87 109.5l-5 7h3.5l-1 6 5.5-7.5h-3.5z" stroke="#9BA1AB" stroke-width="1.1" stroke-linejoin="round"/>
+  <path d="M120 66v6.5a3 3 0 1 1-6 0v-1" stroke="#9BA1AB" stroke-width="1.2" stroke-linecap="round"/>
+  <!-- Core + context ring -->
+  <circle cx="190" cy="150" r="35" fill="#E1AC6E" opacity="0.1"/>
+  <circle cx="190" cy="150" r="30" fill="#12151C" stroke="#E1AC6E" stroke-width="1.3"/>
+  <circle cx="190" cy="150" r="34" stroke="#272C36" stroke-width="2" opacity="0.7"/>
+  <circle cx="190" cy="150" r="34" stroke="#E1AC6E" stroke-width="2.2" stroke-dasharray="145 214" transform="rotate(-90 190 150)" stroke-linecap="round"/>
+  <rect x="174" y="146" width="32" height="6" rx="3" fill="#EBE6DC"/>
+  <rect x="179" y="156" width="22" height="3.5" rx="1.75" fill="#9BA1AB"/>
+  <!-- Right activity feed panel -->
+  <line x1="354" y1="36" x2="354" y2="264" stroke="#272C36" stroke-width="1"/>
+  <!-- Now line -->
+  <rect x="374" y="42" width="140" height="7" rx="3.5" fill="#EBE6DC"/>
+  <rect x="526" y="42" width="72" height="7" rx="3.5" fill="#6B7280" opacity="0.6"/>
+  <!-- Running rows -->
+  <circle cx="380" cy="74" r="3.5" fill="#69A7FF"/>
+  <rect x="392" y="71" width="36" height="5.5" rx="2.75" fill="#69A7FF"/>
+  <rect x="438" y="71" width="104" height="5.5" rx="2.75" fill="#69A7FF"/>
+  <rect x="556" y="71" width="42" height="5.5" rx="2.75" fill="#69A7FF"/>
+  <circle cx="380" cy="96" r="3.5" fill="#69A7FF"/>
+  <rect x="392" y="93" width="36" height="5.5" rx="2.75" fill="#69A7FF"/>
+  <rect x="438" y="93" width="88" height="5.5" rx="2.75" fill="#69A7FF"/>
+  <rect x="556" y="93" width="42" height="5.5" rx="2.75" fill="#69A7FF"/>
+  <!-- Done rows -->
+  <circle cx="380" cy="118" r="2.2" fill="#6B7280"/>
+  <rect x="392" y="115.5" width="34" height="5" rx="2.5" fill="#9BA1AB" opacity="0.7"/>
+  <rect x="438" y="115.5" width="94" height="5" rx="2.5" fill="#9BA1AB" opacity="0.7"/>
+  <rect x="562" y="115.5" width="36" height="5" rx="2.5" fill="#6B7280"/>
+  <circle cx="380" cy="140" r="2.2" fill="#62C7BA"/>
+  <rect x="392" y="137.5" width="40" height="5" rx="2.5" fill="#62C7BA" opacity="0.8"/>
+  <rect x="438" y="137.5" width="82" height="5" rx="2.5" fill="#9BA1AB" opacity="0.7"/>
+  <rect x="562" y="137.5" width="36" height="5" rx="2.5" fill="#6B7280"/>
+  <!-- Switch row -->
+  <rect x="377" y="159" width="6" height="6" transform="rotate(45 380 162)" fill="#E1AC6E"/>
+  <rect x="392" y="159.5" width="34" height="5" rx="2.5" fill="#E1AC6E"/>
+  <rect x="438" y="159.5" width="98" height="5" rx="2.5" fill="#E1AC6E"/>
+  <rect x="582" y="159.5" width="16" height="5" rx="2.5" fill="#6B7280"/>
+  <!-- Error row -->
+  <path d="M377.5 181.5l5 5M382.5 181.5l-5 5" stroke="#E8654F" stroke-width="1.5" stroke-linecap="round"/>
+  <rect x="392" y="181.5" width="32" height="5" rx="2.5" fill="#E8654F"/>
+  <rect x="438" y="181.5" width="108" height="5" rx="2.5" fill="#E8654F"/>
+  <rect x="562" y="181.5" width="36" height="5" rx="2.5" fill="#E8654F"/>
+  <!-- More done rows -->
+  <circle cx="380" cy="206" r="2.2" fill="#6B7280"/>
+  <rect x="392" y="203.5" width="36" height="5" rx="2.5" fill="#9BA1AB" opacity="0.6"/>
+  <rect x="438" y="203.5" width="76" height="5" rx="2.5" fill="#9BA1AB" opacity="0.6"/>
+  <rect x="566" y="203.5" width="32" height="5" rx="2.5" fill="#6B7280"/>
+  <circle cx="380" cy="228" r="2.2" fill="#6B7280"/>
+  <rect x="392" y="225.5" width="34" height="5" rx="2.5" fill="#9BA1AB" opacity="0.6"/>
+  <rect x="438" y="225.5" width="90" height="5" rx="2.5" fill="#9BA1AB" opacity="0.6"/>
+  <rect x="566" y="225.5" width="32" height="5" rx="2.5" fill="#6B7280"/>
+  <circle cx="380" cy="250" r="2.2" fill="#6B7280"/>
+  <rect x="392" y="247.5" width="24" height="5" rx="2.5" fill="#9BA1AB" opacity="0.5"/>
+  <rect x="438" y="247.5" width="66" height="5" rx="2.5" fill="#9BA1AB" opacity="0.5"/>
+  <rect x="582" y="247.5" width="16" height="5" rx="2.5" fill="#6B7280"/>
+</svg>
