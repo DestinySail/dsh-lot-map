@@ -178,6 +178,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
   assert.equal(b.model, 'gemini-4-neon')
   assert.equal(b.context, 24)
   assert.equal(b.pushed, 1)
+  assert.equal(b.turns, 1)
   assert.equal(b.counts.you, 2) // newMessage + answerReady
   assert.equal(b.counts.memory, 1)
   assert.equal(b.counts.files, 2) // read + `rm -rf /` (rm is a FILE_WORD!)
@@ -231,6 +232,27 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
   assert.equal(def.wire.view(p2).entries.find((e) => e.id === 'tc-9').status, 'err')
   assert.equal(def.wire.view(p2).faults.shell, 1)
   assert.equal(def.wire.view(p2).counts.you, youBefore)
+  assert.equal(def.wire.view(p2).turns, 1)
+
+  // board.turns increments only on non-empty human/retry messages, never on memory/system/task notifications
+  let tp = def.init({}, 0)
+  assert.equal(def.wire.view(tp).turns, undefined)
+  tp = def.apply(tp, { type: 'user/message', seq: 1, time: t0 + 1, data: { source: { kind: 'mnemon', form: 'session-start' }, content: [{ type: 'text', text: '[#1]' }] } })
+  assert.equal(def.wire.view(tp).turns, undefined)
+  tp = def.apply(tp, { type: 'user/message', seq: 2, time: t0 + 2, data: { source: { kind: 'user' }, content: [{ type: 'text', text: 'first turn' }] } })
+  assert.equal(def.wire.view(tp).turns, 1)
+  tp = def.apply(tp, { type: 'user/message', seq: 3, time: t0 + 3, data: { source: { kind: 'system', form: 'notice' }, content: [{ type: 'text', text: 'sys' }] } })
+  tp = def.apply(tp, { type: 'user/message', seq: 4, time: t0 + 4, data: { source: { kind: 'task-notification' }, content: '<task-notification><task-id>bg-x</task-id><status>completed</status></task-notification>' } })
+  const tpBeforeEmpty = tp
+  tp = def.apply(tp, { type: 'user/message', seq: 5, time: t0 + 5, data: { source: { kind: 'user' }, content: [{ type: 'text', text: '   ' }] } })
+  assert.equal(tp, tpBeforeEmpty)
+  assert.equal(def.wire.view(tp).turns, 1)
+  tp = def.apply(tp, { type: 'user/message', seq: 6, time: t0 + 6, data: { source: { kind: 'user' }, content: [{ type: 'text', text: 'second turn' }] } })
+  assert.equal(def.wire.view(tp).turns, 2)
+  tp = def.apply(tp, { type: 'user/message', seq: 7, time: t0 + 7, data: { source: { kind: 'retry' }, content: [{ type: 'text', text: 'retry turn' }] } })
+  assert.equal(def.wire.view(tp).turns, 3)
+  def.stateSchema.parse(tp)
+  def.wire.viewSchema.parse(def.wire.view(tp))
 
   // Parallel same-name subagents keep separate orbiting dots and settle one by one
   let p3 = def.init({}, 0)
@@ -310,16 +332,55 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
   assert.deepEqual([...plugin.inject], ['slots', 'sidebarRightTabs', 'sidebarRight'])
   assert.equal(typeof plugin.apply, 'function')
 
-  const { drawMap, foldRows, nowParts, STRINGS, resolveSetup, parsePaneBackground, localizeLabel, shortModel: clientShortModel } = plugin._internals
+  const {
+    DARK,
+    LIGHT,
+    STATIONS,
+    CSS_TEXT,
+    drawMap,
+    foldRows,
+    buildFeedSections,
+    nowParts,
+    STRINGS,
+    resolveSetup,
+    resolvePalette,
+    parseColors,
+    parsePaneBackground,
+    localizeLabel,
+    shortModel: clientShortModel,
+  } = plugin._internals
   assert.deepEqual(Object.keys(STRINGS), ['en', 'zh'])
   assert.equal('fitWidth' in STRINGS.en, false)
   assert.equal(clientShortModel('claude-sonnet-4-20250514'), shortModel('claude-sonnet-4-20250514'))
+  assert.equal(STATIONS.length, 10)
+
+  // DSH typography tokens, zero external fonts, dual theme & station focus CSS checks
+  assert.ok(CSS_TEXT.includes('--dsw-font-family'))
+  assert.ok(CSS_TEXT.includes('--ds-font-family-code'))
+  assert.equal(/Geist|googleapis/i.test(CSS_TEXT), false)
+  assert.equal(/Geist|googleapis/i.test(clientCode), false)
+  assert.ok(CSS_TEXT.includes('.lm-pane[data-lm-theme="dark"]'))
+  assert.ok(CSS_TEXT.includes('.lm-pane[data-lm-theme="light"]'))
+  assert.ok(CSS_TEXT.includes('.lm-map-box[data-focus]'))
+
+  // Distinct light/dark station colors and parseColors legacy + station overrides
+  assert.notEqual(LIGHT.stations.files, DARK.stations.files)
+  const parsedColors = parseColors('background=#123,node=#234,files=#4c8dff,station.web=#ff9a3c,memory=#00aa99')
+  assert.equal(parsedColors.ground, '#112233')
+  assert.equal(parsedColors.raised, '#223344')
+  assert.equal(parsedColors.station_files, '#4c8dff')
+  assert.equal(parsedColors.station_web, '#ff9a3c')
+  assert.equal(parsedColors.mem, '#00aa99')
+  const customPal = resolvePalette(resolveSetup({ theme: 'light', colors: 'files=#4c8dff,station.web=#ff9a3c' }, 'dark', 'zh'))
+  assert.equal(customPal.stations.files, '#4c8dff')
+  assert.equal(customPal.stations.web, '#ff9a3c')
 
   const now = 1_700_000_005_000
   const board = {
     model: 'gemini-4-neon',
     context: 92,
     pushed: 1,
+    turns: 1,
     switchedAt: now - 1500,
     agents: ['reviewer', 'checker'],
     counts: { you: 1, model: 3, memory: 2, files: 4, shell: 1 },
@@ -351,12 +412,17 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
           }, theme, lang)
           const svg = drawMap(board, now, setup)
           assert.ok(svg.startsWith('<svg ') && svg.endsWith('</svg>'))
+          assert.ok(svg.includes('viewBox="0 0 400 352"'))
           assert.ok(svg.includes('92%'))
           assert.ok(svg.includes('DSH'))
           assert.ok(svg.includes('gemini-4-neon'))
           assert.ok(svg.includes('×2'))
           assert.ok(svg.includes('↓1'))
           assert.ok(svg.includes('42k'))
+          assert.equal(svg.includes('未使用') || svg.includes('Unused') || svg.includes('0 次'), false)
+          for (const st of STATIONS) {
+            assert.ok(svg.includes(`class="lm-st-node" data-station="${st.id}" role="button" tabindex="0"`), `missing station button ${st.id}`)
+          }
           if (motion === 'reduced') {
             assert.ok(!svg.includes('<animateMotion'))
           } else {
@@ -371,15 +437,21 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
   const skewedSvg = drawMap(board, now - 500, resolveSetup({ language: 'en', motion: 'full' }, 'dark', 'en'))
   assert.ok(skewedSvg.includes('<animateMotion'))
 
-  // Long model name fits inside core circle with scaled font size
+  // Model name moves to meter/title summary; coreName scales cleanly inside core circle
+  assert.equal(clientShortModel('deepseek-v4.1-flash'), 'deepseek-v4.1-flash')
   const longModelSvg = drawMap({ ...board, model: 'deepseek-v4.1-flash' }, now, resolveSetup({ language: 'zh' }, 'dark', 'zh'))
-  assert.ok(longModelSvg.includes('font-size="6.4"'))
+  assert.ok(longModelSvg.includes('deepseek-v4.1-flash'))
+  assert.ok(longModelSvg.includes('font-size="18"'))
+  const longCoreSvg = drawMap(board, now, resolveSetup({ language: 'zh', coreName: 'LONG-CORE9' }, 'dark', 'zh'))
+  assert.ok(longCoreSvg.includes('LONG-CORE9') && longCoreSvg.includes('font-size="7.5"'))
 
-  // Transparent map background without custom hex omits station text stroke halo so glyphs never smear
+  // External labels avoid spokes/rings without stroke halo; solid vs transparent background controls SVG <rect> plate
   const transparentSvg = drawMap(board, now, resolveSetup({ language: 'zh', background: 'transparent', paneBackground: 'transparent' }, 'light', 'zh'))
+  assert.equal(transparentSvg.includes('<rect width="400" height="352"'), false)
   assert.equal(transparentSvg.includes('paint-order="stroke"'), false)
+  assert.ok(transparentSvg.includes('class="lm-st-label"'))
   const solidSvg = drawMap(board, now, resolveSetup({ language: 'zh', background: 'solid' }, 'dark', 'zh'))
-  assert.ok(solidSvg.includes('paint-order="stroke"'))
+  assert.ok(solidSvg.includes('<rect width="400" height="352" rx="12"'))
 
   // Feed folding check: entries 3 & 4 fold into one row with times=2 and tokens=42000
   const rows = foldRows(board.entries, 16)
@@ -402,6 +474,56 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
   ]
   const heldFeed = foldRows(manyEntries, 16)
   assert.equal(heldFeed.some((r) => r.entry.id === 'old-run' && r.isHeld === true), true)
+
+  // buildFeedSections: running/history split, turn grouping with board.turns + fallback, folding, truncation, station filter
+  const feedEntries = [
+    { id: 'init-1', station: 'memory', labelKey: 'addedMemoryAtStart', from: 'inbound', startedAt: now - 30000, endedAt: now - 30000, status: 'ok' },
+    { id: 't1-u', station: 'you', label: 'new message', labelKey: 'newMessage', from: 'inbound', startedAt: now - 20000, endedAt: now - 20000, status: 'ok' },
+    { id: 't1-f1', station: 'files', label: 'src/1.ts', from: 'core', startedAt: now - 19500, endedAt: now - 19200, status: 'ok', tokens: 1000 },
+    { id: 't1-f2', station: 'files', label: 'src/2.ts', from: 'core', startedAt: now - 19000, endedAt: now - 18700, status: 'ok', tokens: 2000 },
+    { id: 't1-end', station: 'you', label: 'turn interrupted', labelKey: 'turnAborted', from: 'core', startedAt: now - 18000, endedAt: now - 18000, status: 'err' },
+    { id: 't2-u', station: 'you', label: 'new message', labelKey: 'newMessage', from: 'inbound', startedAt: now - 10000, endedAt: now - 10000, status: 'ok' },
+    { id: 't2-sw', station: 'model', label: 'deepseek-chat → gemini-4-neon', from: 'core', startedAt: now - 9500, endedAt: now - 9500, status: 'ok', mark: 'switch' },
+    { id: 't2-web', station: 'web', label: 'docs.example.com', from: 'core', startedAt: now - 9000, endedAt: now - 8500, status: 'err' },
+    { id: 't2-f1', station: 'files', label: 'src/a.ts', from: 'core', startedAt: now - 8000, endedAt: now - 7800, status: 'ok', tokens: 3000 },
+    { id: 't2-f2', station: 'files', label: 'src/b.ts', from: 'core', startedAt: now - 7600, endedAt: now - 7400, status: 'ok', tokens: 4000 },
+    { id: 't2-end', station: 'you', label: 'answer ready', labelKey: 'answerReady', from: 'core', startedAt: now - 6000, endedAt: now - 6000, status: 'ok', mark: 'done' },
+    { id: 'run-1', station: 'shell', label: 'npm test', from: 'core', startedAt: now - 3000, status: 'run', task: 'bg-1' },
+    { id: 'run-2', station: 'files', label: 'src/c.ts', from: 'core', startedAt: now - 1000, status: 'run' },
+  ]
+  const sections = buildFeedSections(feedEntries, { totalTurns: 8, maxRows: 16 })
+  assert.deepEqual([...sections.running.map((e) => e.id)], ['run-2', 'run-1'])
+  assert.equal(sections.turns.length, 3)
+  assert.equal(sections.turns[0].turnNo, 8)
+  assert.equal(sections.turns[0].durationMs, 4000)
+  assert.equal(sections.turns[0].rows.some((r) => r.entry.status === 'run'), false)
+  assert.equal(sections.turns[0].rows.find((r) => r.entry.id === 't2-f2').times, 2)
+  assert.equal(sections.turns[0].rows.find((r) => r.entry.id === 't2-f2').tokens, 7000)
+  assert.equal(sections.turns[0].rows.some((r) => r.entry.id === 't2-sw' && r.entry.mark === 'switch'), true)
+  assert.equal(sections.turns[1].turnNo, 7)
+  assert.equal(sections.turns[1].durationMs, 2000)
+  assert.equal(sections.turns[1].rows.find((r) => r.entry.id === 't1-f2').times, 2)
+  assert.equal(sections.turns[2].turnNo, 6)
+  assert.equal(sections.turns[2].isInit, false)
+
+  const fallbackSections = buildFeedSections(feedEntries, { maxRows: 16 })
+  assert.equal(fallbackSections.turns[0].turnNo, 2)
+  assert.equal(fallbackSections.turns[1].turnNo, 1)
+  assert.equal(fallbackSections.turns[2].isInit, true)
+
+  const webOnly = buildFeedSections(feedEntries, { totalTurns: 8, maxRows: 16, filterStation: 'web' })
+  assert.equal(webOnly.running.length, 0)
+  assert.equal(webOnly.turns.length, 1)
+  assert.equal(webOnly.turns[0].turnNo, 8)
+  assert.equal(webOnly.turns[0].rows[0].entry.id, 't2-web')
+
+  const filesOnly = buildFeedSections(feedEntries, { totalTurns: 8, maxRows: 16, filterStation: 'files' })
+  assert.deepEqual([...filesOnly.running.map((e) => e.id)], ['run-2'])
+  assert.deepEqual([...filesOnly.turns.map((t) => t.turnNo)], [8, 7])
+
+  const capped = buildFeedSections(feedEntries, { totalTurns: 8, maxRows: 3 })
+  assert.equal(capped.running.length, 2)
+  assert.equal(capped.turns.reduce((sum, t) => sum + t.rows.length, 0), 3)
 
   // resolveSetup & localizeLabel checks (zh/en, paneBackground, contextWindow)
   assert.equal(parsePaneBackground('#abc'), '#aabbcc')
