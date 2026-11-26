@@ -347,6 +347,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
     parseColors,
     parsePaneBackground,
     localizeLabel,
+    classifyAutoOpen,
     shortModel: clientShortModel,
   } = plugin._internals
   assert.deepEqual(Object.keys(STRINGS), ['en', 'zh'])
@@ -541,6 +542,51 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 
   const np = nowParts(board, zhSetup.t)
   assert.ok(np.what.includes('文件') && np.what.includes('src/d.ts'))
+
+  // classifyAutoOpen: opens immediately on first message (even with mnemon + step/start burst), skips historical
+  assert.equal(classifyAutoOpen(undefined, now), 'wait')
+  assert.equal(classifyAutoOpen({ entries: [], counts: {} }, now), 'wait')
+  assert.equal(classifyAutoOpen({
+    turns: 1,
+    entries: [
+      { id: 'u1', station: 'you', from: 'inbound', startedAt: now - 50, endedAt: now - 50, status: 'ok' },
+      { id: 'hk1', station: 'hooks', from: 'core', startedAt: now - 40, endedAt: now - 40, status: 'ok' },
+      { id: 'm1', station: 'memory', from: 'inbound', startedAt: now - 40, endedAt: now - 40, status: 'ok' },
+      { id: 'st1', station: 'model', from: 'core', startedAt: now - 10, status: 'run' },
+    ],
+  }, now), 'open')
+  assert.equal(classifyAutoOpen({
+    turns: 2,
+    entries: [
+      { id: 'u1', station: 'you', from: 'inbound', startedAt: now - 2000, endedAt: now - 2000, status: 'ok' },
+      { id: 'u2', station: 'you', from: 'inbound', startedAt: now - 10, endedAt: now - 10, status: 'ok' },
+    ],
+  }, now), 'skip')
+  assert.equal(classifyAutoOpen({
+    turns: 1,
+    entries: [
+      { id: 'u1', station: 'you', from: 'inbound', startedAt: now - 500, endedAt: now - 500, status: 'ok' },
+      { id: 'done1', station: 'you', from: 'core', startedAt: now - 100, endedAt: now - 100, status: 'ok', mark: 'done' },
+    ],
+  }, now), 'skip')
+  assert.equal(classifyAutoOpen({
+    turns: 1,
+    entries: [
+      { id: 'u1', station: 'you', from: 'inbound', startedAt: now - 20_000, endedAt: now - 20_000, status: 'ok' },
+    ],
+  }, now), 'skip')
+  assert.equal(classifyAutoOpen({
+    entries: Array.from({ length: 7 }, (_, i) => ({
+      id: `e-${i}`,
+      station: 'files',
+      from: 'core',
+      startedAt: now - 100,
+      endedAt: now - 100,
+      status: 'ok',
+    })),
+  }, now), 'skip')
+  assert.equal(clientCode.includes('[sessionId, env.prefs.openAtStart, entries.length]'), false)
+
   console.log('[PASS] Client module, drawMap SVG (2 languages × themes × layouts × motion), and feed folding verified')
 }
 

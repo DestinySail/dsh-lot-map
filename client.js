@@ -2715,6 +2715,29 @@ ${FOCUS_CSS}
       } catch { /* ignore storage errors */ }
     }
 
+    const AUTO_OPEN_STALE_MS = 15_000
+
+    function classifyAutoOpen(board, now = Date.now()) {
+      if (!board || typeof board !== 'object') return 'wait'
+      const entries = Array.isArray(board.entries) ? board.entries : []
+      if (entries.length === 0) return 'wait'
+      const isRunning = entries.some((e) => e.status === 'run')
+      const hasDone = entries.some((e) => e.mark === 'done' || e.labelKey === 'turnAborted')
+      const turns = typeof board.turns === 'number'
+        ? board.turns
+        : entries.filter((e) => e.station === 'you' && e.from === 'inbound' && e.mark === undefined).length
+      if (turns > 1) return 'skip'
+      if (hasDone && !isRunning) return 'skip'
+      if (turns === 0 && entries.length > 6) return 'skip'
+      let latestAt = 0
+      for (const e of entries) {
+        const ts = typeof e.endedAt === 'number' ? e.endedAt : (typeof e.startedAt === 'number' ? e.startedAt : 0)
+        if (ts > latestAt) latestAt = ts
+      }
+      if (!isRunning && latestAt > 0 && now - latestAt > AUTO_OPEN_STALE_MS) return 'skip'
+      return 'open'
+    }
+
     function createHeaderTrigger(ctx, bridge) {
       const autoOpenedSessions = loadOpenedSet()
       const handledCommandSeq = new Map()
@@ -2727,6 +2750,9 @@ ${FOCUS_CSS}
         const entries = Array.isArray(board?.entries) ? board.entries : []
         const isRunning = entries.some((e) => e.status === 'run')
         const openReq = typeof board?.openRequestSeq === 'number' ? board.openRequestSeq : 0
+        const autoOpenAction = env.prefs.openAtStart === true && sessionId && !autoOpenedSessions.has(sessionId)
+          ? classifyAutoOpen(board)
+          : 'idle'
 
         // Handle `/lot-map` slash command trigger from session log
         useEffect(() => {
@@ -2744,24 +2770,51 @@ ${FOCUS_CSS}
           }
         }, [sessionId, openReq])
 
-        // Handle `openAtStart` option: only open automatically for fresh sessions, not historical ones on reload
+        // Handle `openAtStart` option: open as soon as the first message arrives in a fresh session
         useEffect(() => {
-          if (!sessionId || env.prefs.openAtStart !== true) return
+          if (!sessionId || autoOpenAction === 'idle' || autoOpenAction === 'wait') return
           if (autoOpenedSessions.has(sessionId)) return
-          if (entries.length > 2) {
+          if (autoOpenAction === 'skip') {
             autoOpenedSessions.add(sessionId)
             saveOpenedSet(autoOpenedSessions)
             return
           }
-          autoOpenedSessions.add(sessionId)
-          saveOpenedSet(autoOpenedSessions)
-          const timer = setTimeout(() => {
+
+          // ponytail: retries openTabIn up to 10×100ms in case RightbarSeat has not adopted sessionId yet;
+          // upgrade to a sidebarRight.mounted/openTabs subscription if host adoption latency ever exceeds 1s.
+          let cancelled = false
+          let attempts = 0
+          let timer = null
+
+          const isTabOpened = () => {
+            const openTabs = ctx.sidebarRight?.openTabs?.getSnapshot?.()
+            if (!Array.isArray(openTabs)) return true
+            return openTabs.some((row) => row?.sessionId === sessionId && row?.kind === TAB_KIND)
+          }
+
+          const tryOpen = () => {
+            if (cancelled || autoOpenedSessions.has(sessionId)) return
+            attempts += 1
             try {
               ctx.sidebarRight?.openTabIn?.(sessionId, TAB_KIND)
-            } catch { /* ignore if surface unmounted */ }
-          }, 120)
-          return () => clearTimeout(timer)
-        }, [sessionId, env.prefs.openAtStart, entries.length])
+            } catch { /* retry if surface not ready yet */ }
+
+            if (isTabOpened()) {
+              autoOpenedSessions.add(sessionId)
+              saveOpenedSet(autoOpenedSessions)
+              return
+            }
+            if (attempts < 10) {
+              timer = setTimeout(tryOpen, 100)
+            }
+          }
+
+          tryOpen()
+          return () => {
+            cancelled = true
+            if (timer !== null) clearTimeout(timer)
+          }
+        }, [sessionId, autoOpenAction])
 
         const onClick = useCallback(() => {
           if (!sessionId) return
@@ -2921,6 +2974,7 @@ ${FOCUS_CSS}
         parsePaneBackground,
         localizeLabel,
         LiveTimer,
+        classifyAutoOpen,
       },
     }
   },
